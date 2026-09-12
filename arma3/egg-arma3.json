@@ -373,7 +373,7 @@
         },
         {
             "name": "[System] Steam Workshop Mods Variable",
-            "description": "The name of the variable the Workshop extension should add/remove \"@<id>\" Workshop item tokens from. For this egg that's the \"Additional Mods\" variable (MODIFICATIONS) - the same variable this egg's entrypoint already scans for \"@<id>\" tokens to auto-download/update via steamcmd on every server start. Rarely needs to be changed.",
+            "description": "The name of the variable the Workshop extension should add/remove \"@<id>\" Workshop item tokens from by default (the \"Add\" button's \"Client Mod\" option). For this egg that's the \"Additional Mods\" variable (MODIFICATIONS) - the same variable this egg's entrypoint already scans for \"@<id>\" tokens to auto-download/update via steamcmd on every server start. Rarely needs to be changed.",
             "env_variable": "WORKSHOP_MODS_VARIABLE",
             "default_value": "MODIFICATIONS",
             "user_viewable": false,
@@ -383,6 +383,32 @@
                 "string"
             ],
             "sort": 27
+        },
+        {
+            "name": "[System] Steam Workshop Server Mods Variable",
+            "description": "The name of the variable the Workshop extension should use for the \"Add as Server-Only Mod\" option - Arma 3's \"[Advanced] Server-Side Only Mods\" variable (SERVERMODS). Server-only mods are pooled into the same steamcmd download step as regular mods, but only passed to the server's own -serverMod= parameter, not required by connecting clients. Rarely needs to be changed.",
+            "env_variable": "WORKSHOP_SERVER_MODS_VARIABLE",
+            "default_value": "SERVERMODS",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": [
+                "nullable",
+                "string"
+            ],
+            "sort": 28
+        },
+        {
+            "name": "[System] Steam Workshop Optional Mods Variable",
+            "description": "The name of the variable the Workshop extension should use for the \"Add as Optional Mod\" option - Arma 3's \"[Advanced] Optional Client-Side Mods\" variable (OPTIONALMODS). Optional mods are downloaded and kept up to date, but clients can connect with or without them loaded. Rarely needs to be changed.",
+            "env_variable": "WORKSHOP_OPTIONAL_MODS_VARIABLE",
+            "default_value": "OPTIONALMODS",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": [
+                "nullable",
+                "string"
+            ],
+            "sort": 29
         }
     ]
 }
