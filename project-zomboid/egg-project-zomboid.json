@@ -238,6 +238,20 @@
                 "required",
                 "string"
             ]
+        },
+        {
+            "sort": 16,
+            "name": "Steam API Key",
+            "description": "Your own Steam Web API key for searching the Workshop, so you're not sharing the panel-wide key/quota. Leave blank to use the panel's own key instead. Get one free at https://steamcommunity.com/dev/apikey.",
+            "env_variable": "STEAM_API_KEY",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "secret": true,
+            "rules": [
+                "nullable",
+                "string"
+            ]
         }
     ]
 }
