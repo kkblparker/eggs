@@ -2,7 +2,7 @@
     "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PANEL",
     "meta": {
         "version": "PLCN_v1",
-        "update_url": "https:\/\/raw.githubusercontent.com\/pelican-eggs\/games-steamcmd\/refs\/heads\/main\/arma\/arma3\/egg-arma3.json"
+        "update_url": "https://raw.githubusercontent.com/pelican-eggs/games-steamcmd/refs/heads/main/arma/arma3/egg-arma3.json"
     },
     "exported_at": "2026-04-06T02:01:23+00:00",
     "name": "Arma 3",
@@ -17,21 +17,21 @@
         "steam_workshop"
     ],
     "docker_images": {
-        "ghcr.io\/parkervcp\/games:arma3": "ghcr.io\/parkervcp\/games:arma3"
+        "ghcr.io/parkervcp/games:arma3": "ghcr.io/parkervcp/games:arma3"
     },
     "file_denylist": [],
-    "startup": ".\/{{SERVER_BINARY}} -par=startup_params_server.txt",
+    "startup": "./{{SERVER_BINARY}} -par=startup_params_server.txt",
     "config": {
-        "files": "{\r\n    \"server.cfg\": {\r\n        \"parser\": \"file\",\r\n        \"find\": {\r\n            \"password=\": \"password = \\\"{{server.environment.SERVER_PASSWORD}}\\\";\",\r\n            \"\/\/password=\": \"password = \\\"{{server.environment.SERVER_PASSWORD}}\\\";\",\r\n            \"password =\": \"password = \\\"{{server.environment.SERVER_PASSWORD}}\\\";\",\r\n            \"\/\/password =\": \"password = \\\"{{server.environment.SERVER_PASSWORD}}\\\";\",\r\n            \"maxPlayers\": \"maxPlayers = {{server.environment.MAX_PLAYERS}};\",\r\n            \"headlessClients\": \"headlessClients[] = { \\\"127.0.0.1\\\" };\",\r\n            \"localClient\": \"localClient[] = { \\\"127.0.0.1\\\" };\"\r\n        }\r\n    },\r\n    \"battleye\/launch\/beserver.cfg\": {\r\n        \"parser\": \"file\",\r\n        \"find\": {\r\n            \"RConPassword\": \"RConPassword {{server.environment.RCON_PASSWORD}}\",\r\n            \"RConPort\": \"RConPort {{server.environment.RCON_PORT}}\"\r\n        }\r\n    },\r\n    \"battleye\/launch\/beserver_x64.cfg\": {\r\n        \"parser\": \"file\",\r\n        \"find\": {\r\n            \"RConPassword\": \"RConPassword {{server.environment.RCON_PASSWORD}}\",\r\n            \"RConPort\": \"RConPort {{server.environment.RCON_PORT}}\"\r\n        }\r\n    }\r\n}",
+        "files": "{\r\n    \"server.cfg\": {\r\n        \"parser\": \"file\",\r\n        \"find\": {\r\n            \"password=\": \"password = \\\"{{server.environment.SERVER_PASSWORD}}\\\";\",\r\n            \"//password=\": \"password = \\\"{{server.environment.SERVER_PASSWORD}}\\\";\",\r\n            \"password =\": \"password = \\\"{{server.environment.SERVER_PASSWORD}}\\\";\",\r\n            \"//password =\": \"password = \\\"{{server.environment.SERVER_PASSWORD}}\\\";\",\r\n            \"maxPlayers\": \"maxPlayers = {{server.environment.MAX_PLAYERS}};\",\r\n            \"headlessClients\": \"headlessClients[] = { \\\"127.0.0.1\\\" };\",\r\n            \"localClient\": \"localClient[] = { \\\"127.0.0.1\\\" };\"\r\n        }\r\n    },\r\n    \"battleye/launch/beserver.cfg\": {\r\n        \"parser\": \"file\",\r\n        \"find\": {\r\n            \"RConPassword\": \"RConPassword {{server.environment.RCON_PASSWORD}}\",\r\n            \"RConPort\": \"RConPort {{server.environment.RCON_PORT}}\"\r\n        }\r\n    },\r\n    \"battleye/launch/beserver_x64.cfg\": {\r\n        \"parser\": \"file\",\r\n        \"find\": {\r\n            \"RConPassword\": \"RConPassword {{server.environment.RCON_PASSWORD}}\",\r\n            \"RConPort\": \"RConPort {{server.environment.RCON_PORT}}\"\r\n        }\r\n    }\r\n}",
         "startup": "{\r\n    \"done\": \"Host identity created.\"\r\n}",
         "logs": "{}",
         "stop": "^C"
     },
     "scripts": {
         "installation": {
-            "script": "#!\/bin\/bash\r\n\r\n## File: Pelican Arma 3 Egg - egg-arma3.json\r\n## Author: David Wolfe (Red-Thirten)\r\n## Date: 2025\/10\/06\r\n## License: MIT License\r\n## Image to install with is 'ghcr.io\/parkervcp\/installers:debian'\r\n\r\n# Download URL for a default Arma 3 server.cfg\r\n# (Feel free to modify to your own preferred, self-hosted file if you wish)\r\nSERVER_CFG_URL=\"https:\/\/raw.githubusercontent.com\/pelican-eggs\/games-steamcmd\/main\/arma\/arma3\/egg-arma3-config\/server.cfg\"\r\n\r\n# Install packages. Default packages below are skipped if using image noted above, thus speeding up the install process.\r\napt -y update\r\napt -y --no-install-recommends install curl lib32gcc-s1 ca-certificates\r\n\r\n# Check for valid Steam credentials to download Arma 3 with (requires valid Steam account)\r\nif [[ \"${STEAM_USER}\" == \"\" ]] || [[ \"${STEAM_USER}\" == \"anonymous\" ]] || [[ \"${STEAM_PASS}\" == \"\" ]]; then\r\n    echo -e \"INSTALLATION ERROR: A valid REAL Steam account is required to download the Arma 3 Dedicated Server.\"\r\n    echo -e \"\\t(\\\"anonymous\\\" account cannot be used. Game ownership is not required.)\"\r\n    exit 1\r\nfi\r\n\r\n# Download and install SteamCMD\r\ncd \/tmp\r\nmkdir -p \/mnt\/server\/steamcmd \/mnt\/server\/steamapps\r\ncurl -sSL -o steamcmd.tar.gz https:\/\/steamcdn-a.akamaihd.net\/client\/installer\/steamcmd_linux.tar.gz\r\ntar -xzvf steamcmd.tar.gz -C \/mnt\/server\/steamcmd\r\ncd \/mnt\/server\/steamcmd\r\n\r\n# SteamCMD fails otherwise for some reason, even running as root.\r\nchown -R root:root \/mnt\r\nexport HOME=\/mnt\/server\r\n\r\n# Install game server using SteamCMD\r\necho -e \"\\nInstalling\/Validating Arma 3 Dedicated Server Files...\"\r\necho -e \"(It is okay to ignore any \\\"SDL\\\", \\\"steamservice\\\", and \\\"thread priority\\\" errors during this process)\"\r\nif [[ -n ${STEAMCMD_BETAID} ]]; then\r\n    echo -e \"\\tDownload\/Update of \\\"${STEAMCMD_BETAID}\\\" branch enabled.\"\r\nfi\r\necho -e \"\"\r\n.\/steamcmd.sh +force_install_dir \/mnt\/server \"+login \\\"${STEAM_USER}\\\" \\\"${STEAM_PASS}\\\"\" +app_update ${STEAMCMD_APPID} $( [[ -n ${STEAMCMD_BETAID} ]] && printf %s \"-beta ${STEAMCMD_BETAID}\" ) validate +quit\r\n\r\n# Set up 32 and 64 bit libraries\r\nmkdir -p \/mnt\/server\/.steam\/sdk{32,64}\r\ncp -v linux32\/steamclient.so \/mnt\/server\/.steam\/sdk32\/steamclient.so\r\ncp -v linux64\/steamclient.so \/mnt\/server\/.steam\/sdk64\/steamclient.so\r\n\r\n# Arma 3 setup\r\ncd \/mnt\/server\/\r\n[[ -f server.cfg ]] || curl -sSLO ${SERVER_CFG_URL} # Download default server.cfg file\r\n[[ -f basic.cfg ]] || curl -sSLO ${BASIC_CFG_URL} # Download default basic.cfg file\r\nchmod 644 server.cfg basic.cfg\r\nmkdir -p .\/battleye\/launch # Create BattlEye config files\r\ntee .\/battleye\/launch\/beserver.cfg .\/battleye\/launch\/beserver_x64.cfg > \/dev\/null <<EOF\r\nRConPassword $RCON_PASSWORD\r\nRConPort $RCON_PORT\r\nEOF\r\n\r\nif [[ -f \"arma3server_x64\" && -f \"server.cfg\" && -f \"basic.cfg\" ]]; then\r\n    echo -e \"\\nArma 3 Dedicated Server successfully installed!\\n\"\r\nelse\r\n    echo -e \"\\n\\nFailed to install the Arma 3 Dedicated Server!\"\r\n    echo -e \"\\tReview the installation logs for any errors before trying again.\\n\"\r\n    exit 1\r\nfi",
-            "container": "ghcr.io\/parkervcp\/installers:debian",
-            "entrypoint": "\/bin\/bash"
+            "script": "#!/bin/bash\r\n\r\n## File: Pelican Arma 3 Egg - egg-arma3.json\r\n## Author: David Wolfe (Red-Thirten)\r\n## Date: 2025/10/06\r\n## License: MIT License\r\n## Image to install with is 'ghcr.io/parkervcp/installers:debian'\r\n\r\n# Download URL for a default Arma 3 server.cfg\r\n# (Feel free to modify to your own preferred, self-hosted file if you wish)\r\nSERVER_CFG_URL=\"https://raw.githubusercontent.com/pelican-eggs/games-steamcmd/main/arma/arma3/egg-arma3-config/server.cfg\"\r\n\r\n# Install packages. Default packages below are skipped if using image noted above, thus speeding up the install process.\r\napt -y update\r\napt -y --no-install-recommends install curl lib32gcc-s1 ca-certificates\r\n\r\n# Check for valid Steam credentials to download Arma 3 with (requires valid Steam account)\r\nif [[ \"${STEAM_USER}\" == \"\" ]] || [[ \"${STEAM_USER}\" == \"anonymous\" ]] || [[ \"${STEAM_PASS}\" == \"\" ]]; then\r\n    echo -e \"INSTALLATION ERROR: A valid REAL Steam account is required to download the Arma 3 Dedicated Server.\"\r\n    echo -e \"\\t(\\\"anonymous\\\" account cannot be used. Game ownership is not required.)\"\r\n    exit 1\r\nfi\r\n\r\n# Download and install SteamCMD\r\ncd /tmp\r\nmkdir -p /mnt/server/steamcmd /mnt/server/steamapps\r\ncurl -sSL -o steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz\r\ntar -xzvf steamcmd.tar.gz -C /mnt/server/steamcmd\r\ncd /mnt/server/steamcmd\r\n\r\n# SteamCMD fails otherwise for some reason, even running as root.\r\nchown -R root:root /mnt\r\nexport HOME=/mnt/server\r\n\r\n# Install game server using SteamCMD\r\necho -e \"\\nInstalling/Validating Arma 3 Dedicated Server Files...\"\r\necho -e \"(It is okay to ignore any \\\"SDL\\\", \\\"steamservice\\\", and \\\"thread priority\\\" errors during this process)\"\r\nif [[ -n ${STEAMCMD_BETAID} ]]; then\r\n    echo -e \"\\tDownload/Update of \\\"${STEAMCMD_BETAID}\\\" branch enabled.\"\r\nfi\r\necho -e \"\"\r\n./steamcmd.sh +force_install_dir /mnt/server \"+login \\\"${STEAM_USER}\\\" \\\"${STEAM_PASS}\\\"\" +app_update ${STEAMCMD_APPID} $( [[ -n ${STEAMCMD_BETAID} ]] && printf %s \"-beta ${STEAMCMD_BETAID}\" ) validate +quit\r\n\r\n# Set up 32 and 64 bit libraries\r\nmkdir -p /mnt/server/.steam/sdk{32,64}\r\ncp -v linux32/steamclient.so /mnt/server/.steam/sdk32/steamclient.so\r\ncp -v linux64/steamclient.so /mnt/server/.steam/sdk64/steamclient.so\r\n\r\n# Arma 3 setup\r\ncd /mnt/server/\r\n[[ -f server.cfg ]] || curl -sSLO ${SERVER_CFG_URL} # Download default server.cfg file\r\n[[ -f basic.cfg ]] || curl -sSLO ${BASIC_CFG_URL} # Download default basic.cfg file\r\nchmod 644 server.cfg basic.cfg\r\nmkdir -p ./battleye/launch # Create BattlEye config files\r\ntee ./battleye/launch/beserver.cfg ./battleye/launch/beserver_x64.cfg > /dev/null <<EOF\r\nRConPassword $RCON_PASSWORD\r\nRConPort $RCON_PORT\r\nEOF\r\n\r\nif [[ -f \"arma3server_x64\" && -f \"server.cfg\" && -f \"basic.cfg\" ]]; then\r\n    echo -e \"\\nArma 3 Dedicated Server successfully installed!\\n\"\r\nelse\r\n    echo -e \"\\n\\nFailed to install the Arma 3 Dedicated Server!\"\r\n    echo -e \"\\tReview the installation logs for any errors before trying again.\\n\"\r\n    exit 1\r\nfi",
+            "container": "ghcr.io/parkervcp/installers:debian",
+            "entrypoint": "/bin/bash"
         }
     },
     "variables": [
@@ -76,7 +76,7 @@
         },
         {
             "name": "[Host] RCon Port",
-            "description": "BattlEye's RCon port for remote connections with an Arma 3 compliant RCon client\/tool. If set to 0, remote connections are disabled. (Note: This port is different from the \"BattlEye traffic\" port and must be unique)",
+            "description": "BattlEye's RCon port for remote connections with an Arma 3 compliant RCon client/tool. If set to 0, remote connections are disabled. (Note: This port is different from the \"BattlEye traffic\" port and must be unique)",
             "env_variable": "RCON_PORT",
             "default_value": "",
             "user_viewable": true,
@@ -102,7 +102,7 @@
         },
         {
             "name": "Arma 3 Branch (CDLC, etc.)",
-            "description": "Downloads\/Updates a specific Arma 3 branch during server install or the next Automatic Update. \"public\" is the default branch. \"creatordlc\" will install all mod files required to run any Creator DLC (CDLC). CDLCs can be enabled by adding their mod folder name to the \"Additional Mods\" startup variable. For example, add \"vn;\" to load the Prairie Fire CDLC. \"profiling\" is for running the special profiling build of the server.",
+            "description": "Downloads/Updates a specific Arma 3 branch during server install or the next Automatic Update. \"public\" is the default branch. \"creatordlc\" will install all mod files required to run any Creator DLC (CDLC). CDLCs can be enabled by adding their mod folder name to the \"Additional Mods\" startup variable. For example, add \"vn;\" to load the Prairie Fire CDLC. \"profiling\" is for running the special profiling build of the server.",
             "env_variable": "STEAMCMD_BETAID",
             "default_value": "public",
             "user_viewable": true,
@@ -157,7 +157,7 @@
         },
         {
             "name": "Modlist File (Exported from A3 Launcher)",
-            "description": "Filename for a modlist exported from the Arma 3 Launcher. This file will be parsed for mod installation and loading. Upload your HTML file to the root directory (eg. \/home\/container\/modlist.html). Leave blank to disable loading mods from a modlist.",
+            "description": "Filename for a modlist exported from the Arma 3 Launcher. This file will be parsed for mod installation and loading. Upload your HTML file to the root directory (eg. /home/container/modlist.html). Leave blank to disable loading mods from a modlist.",
             "env_variable": "MOD_FILE",
             "default_value": "modlist.html",
             "user_viewable": true,
@@ -183,7 +183,7 @@
         },
         {
             "name": "Disable Verbose Logging",
-            "description": "Adds the \"-noLogs\" startup parameter. Significantly reduces console output\/spam. Note: Enabling this will also prevent `.rpt` logs from being generated.",
+            "description": "Adds the \"-noLogs\" startup parameter. Significantly reduces console output/spam. Note: Enabling this will also prevent `.rpt` logs from being generated.",
             "env_variable": "PARAM_NOLOGS",
             "default_value": "1",
             "user_viewable": true,
@@ -219,7 +219,7 @@
         },
         {
             "name": "RCon Password",
-            "description": "BattlEye's RCon password for remote connections with an Arma 3 compliant RCon client\/tool. It is recommended to choose a strong password that only contains alpha-numerics. The server config file (server.cfg) must contain `BattlEye = 1;` otherwise RCon is disabled.",
+            "description": "BattlEye's RCon password for remote connections with an Arma 3 compliant RCon client/tool. It is recommended to choose a strong password that only contains alpha-numerics. The server config file (server.cfg) must contain `BattlEye = 1;` otherwise RCon is disabled.",
             "env_variable": "RCON_PASSWORD",
             "default_value": "",
             "user_viewable": true,
@@ -270,7 +270,7 @@
         },
         {
             "name": "[Advanced] Server FPS",
-            "description": "Adjusts the maximum number of simulation cycles the server will try to run per second. Higher values mean network messages are sent out more frequently, entities (units\/vehicles\/projectiles\/etc) are simulated more often, as well as AI behavior and vision calculations are done more often. The practical impact of higher values vary based on the mission file, and may cause additional unwanted overhead. Adjust with caution. Value will be applied to HCs as well.",
+            "description": "Adjusts the maximum number of simulation cycles the server will try to run per second. Higher values mean network messages are sent out more frequently, entities (units/vehicles/projectiles/etc) are simulated more often, as well as AI behavior and vision calculations are done more often. The practical impact of higher values vary based on the mission file, and may cause additional unwanted overhead. Adjust with caution. Value will be applied to HCs as well.",
             "env_variable": "PARAM_LIMITFPS",
             "default_value": "50",
             "user_viewable": true,
@@ -284,7 +284,7 @@
         },
         {
             "name": "[Advanced] Headless Clients (HC)",
-            "description": "Number of Headless Clients (0 - 5) to launch parallel with the server. Be sure to set the following \"HC Connect Password\" variable if your server is password locked. PLEASE NOTE: Using a headless client is only recommended for advanced users, adds extra overhead to your permitted server resources, and is only beneficial if a properly written, HC compliant mission file is provided. See https:\/\/community.bistudio.com\/wiki\/Arma_3:_Headless_Client for more info.",
+            "description": "Number of Headless Clients (0 - 5) to launch parallel with the server. Be sure to set the following \"HC Connect Password\" variable if your server is password locked. PLEASE NOTE: Using a headless client is only recommended for advanced users, adds extra overhead to your permitted server resources, and is only beneficial if a properly written, HC compliant mission file is provided. See https://community.bistudio.com/wiki/Arma_3:_Headless_Client for more info.",
             "env_variable": "HC_NUM",
             "default_value": "0",
             "user_viewable": true,
@@ -349,7 +349,7 @@
             "name": "[System] basic.cfg URL",
             "description": "URL to a valid Arma 3 basic.cfg file. The \"Basic\" configuration file is used during server runtime for advanced network performance tuning. Because it is a required file, this URL is used to download it during installation, or if the file is found missing during startup.",
             "env_variable": "BASIC_CFG_URL",
-            "default_value": "https:\/\/raw.githubusercontent.com\/pelican-eggs\/games-steamcmd\/main\/arma\/arma3\/egg-arma3-config\/basic.cfg",
+            "default_value": "https://raw.githubusercontent.com/pelican-eggs/games-steamcmd/main/arma/arma3/egg-arma3-config/basic.cfg",
             "user_viewable": false,
             "user_editable": false,
             "rules": [
@@ -409,6 +409,19 @@
                 "string"
             ],
             "sort": 29
+        },
+        {
+            "sort": 30,
+            "name": "[System] Server Query Protocol",
+            "description": "Which query protocol the Player Count extension should use to fetch live online/max player counts for this server (\"minecraft\" for Minecraft's Server List Ping, \"source\" for the Source-engine A2S protocol). Set by the egg, not the server owner.",
+            "env_variable": "SERVER_QUERY_PROTOCOL",
+            "default_value": "source",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": [
+                "required",
+                "string"
+            ]
         }
     ]
 }

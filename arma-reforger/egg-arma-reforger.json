@@ -7,7 +7,7 @@
     "exported_at": "2024-07-03T21:46:20-07:00",
     "name": "Arma Reforger",
     "author": "red_thirten@yahoo.com",
-    "description": "Experience authentic Cold War combat and join friends in the struggle for a sprawling, 51 km² mid-Atlantic island — or take on the role of Game Master and create your very own scenarios for others to enjoy.",
+    "description": "Experience authentic Cold War combat and join friends in the struggle for a sprawling, 51 km\u00b2 mid-Atlantic island \u2014 or take on the role of Game Master and create your very own scenarios for others to enjoy.",
     "features": [
         "steam_disk_space",
         "reforger_workshop"
@@ -373,6 +373,16 @@
             "user_viewable": false,
             "user_editable": false,
             "rules": "required|integer",
+            "field_type": "text"
+        },
+        {
+            "name": "[System] Server Query Protocol",
+            "description": "Which query protocol the Player Count extension should use to fetch live online/max player counts for this server (\"minecraft\" for Minecraft's Server List Ping, \"source\" for the Source-engine A2S protocol). Set by the egg, not the server owner.",
+            "env_variable": "SERVER_QUERY_PROTOCOL",
+            "default_value": "source",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|string",
             "field_type": "text"
         }
     ]

@@ -106,6 +106,16 @@
             "user_editable": false,
             "rules": "required|string",
             "field_type": "text"
+        },
+        {
+            "name": "[System] Server Query Protocol",
+            "description": "Which query protocol the Player Count extension should use to fetch live online/max player counts for this server (\"minecraft\" for Minecraft's Server List Ping, \"source\" for the Source-engine A2S protocol). Set by the egg, not the server owner.",
+            "env_variable": "SERVER_QUERY_PROTOCOL",
+            "default_value": "minecraft",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|string",
+            "field_type": "text"
         }
     ]
 }
