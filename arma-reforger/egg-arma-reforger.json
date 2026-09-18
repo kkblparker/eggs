@@ -16,7 +16,7 @@
         "ghcr.io/ptero-eggs/steamcmd:debian": "ghcr.io/ptero-eggs/steamcmd:debian"
     },
     "file_denylist": [],
-    "startup": "sed -i 's/\"true\"/true/g; s/\"false\"/false/g' config.json; ./ArmaReforgerServer -gproj ./addons/data/ArmaReforger.gproj -config ./config.json -profile ./profile -backendlog -nothrow -listScenarios -logStats $(({{LOG_INTERVAL}}*1000)) -maxFPS {{MAX_FPS}} -addonTempDir ./tmp",
+    "startup": "sed -i 's/\"true\"/true/g; s/\"false\"/false/g' config.json; $( [ -z \"${PUBLIC_ADDRESS}\" ] || sed -i \"s/\\\"publicAddress\\\": \\\"[^\\\"]*\\\"/\\\"publicAddress\\\": \\\"${PUBLIC_ADDRESS}\\\"/\" config.json ); ./ArmaReforgerServer -gproj ./addons/data/ArmaReforger.gproj -config ./config.json -profile ./profile -backendlog -nothrow -listScenarios -logStats $(({{LOG_INTERVAL}}*1000)) -maxFPS {{MAX_FPS}} -addonTempDir ./tmp",
     "config": {
         "files": "{\n    \"config.json\": {\n        \"parser\": \"json\",\n        \"find\": {\n            \"bindAddress\": \"0.0.0.0\",\n            \"bindPort\": \"{{server.build.default.port}}\",\n            \"publicAddress\": \"{{server.build.default.ip}}\",\n            \"publicPort\": \"{{server.build.default.port}}\",\n            \"game.name\": \"{{server.build.env.SERVER_NAME}}\",\n            \"game.password\": \"{{server.build.env.SERVER_PASS}}\",\n            \"game.passwordAdmin\": \"{{server.build.env.ADMIN_PASS}}\",\n            \"game.scenarioId\": \"{{server.build.env.SCENARIO_ID}}\",\n            \"game.maxPlayers\": \"{{server.build.env.MAX_PLAYERS}}\",\n            \"game.visible\": \"{{server.build.env.VISIBLE}}\",\n            \"game.gameProperties.disableThirdPerson\": \"{{server.build.env.DISABLE_THIRD}}\",\n            \"game.gameProperties.fastValidation\": true,\n            \"game.gameProperties.battlEye\": \"{{server.build.env.BATTLEYE}}\",\n            \"game.gameProperties.serverMaxViewDistance\": \"{{server.build.env.VIEW_DISTANCE}}\",\n            \"game.gameProperties.serverMinGrassDistance\": \"{{server.build.env.GRASS_DISTANCE}}\",\n            \"game.gameProperties.networkViewDistance\": \"{{server.build.env.NETWORK_VIEW_DISTANCE}}\",\n            \"game.gameProperties.VONDisableUI\": \"{{server.build.env.VON_DISABLE_UI}}\",\n            \"game.gameProperties.VONDisableDirectSpeechUI\": \"{{server.build.env.VON_DISABLE_DIRECT_UI}}\",\n            \"operating.playerSaveTime\": \"{{server.build.env.PLAYER_SAVE_TIME}}\",\n            \"operating.aiLimit\": \"{{server.build.env.AI_LIMIT}}\",\n            \"operating.disableServerShutdown\": \"{{server.build.env.DISABLE_SERVER_SHUTDOWN}}\",\n            \"operating.disableCrashReporter\": \"{{server.build.env.DISABLE_CRASH_REPORTER}}\",\n            \"a2s.address\": \"0.0.0.0\",\n            \"a2s.port\": \"{{server.build.env.A2S_PORT}}\"\n        }\n    }\n}",
         "startup": "{\r\n    \"done\": \"Starting RPL server\"\r\n}",
@@ -392,6 +392,16 @@
             "user_viewable": false,
             "user_editable": false,
             "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Public/WAN Address",
+            "description": "Your public/WAN IP address or DDNS hostname, so players outside your local network can actually connect and the server can be direct-joined correctly. Leave blank to use the server's local network address instead (LAN-only - players outside your network won't be able to connect or find it).",
+            "env_variable": "PUBLIC_ADDRESS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
             "field_type": "text"
         }
     ]
