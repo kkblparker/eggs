@@ -1,0 +1,159 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PANEL",
+    "meta": {
+        "version": "PLCN_v1",
+        "update_url": null
+    },
+    "exported_at": "2026-10-12T00:00:00+00:00",
+    "name": "Commonwealth Online",
+    "author": "kkblparker@gmail.com",
+    "uuid": "1205dbde-9aa1-42d6-a34d-dcff4fcf3d67",
+    "description": "Commonwealth Online dedicated relay server (Python). Installs the server/ directory from the Commonwealth-Online-Server repository and runs it via start.sh, which manages its own virtualenv. Game traffic is TCP on the primary allocation.",
+    "tags": [
+        "python"
+    ],
+    "features": [],
+    "docker_images": {
+        "Python 3.12": "ghcr.io/parkervcp/yolks:python_3.12",
+        "Python 3.11": "ghcr.io/parkervcp/yolks:python_3.11",
+        "Python 3.13": "ghcr.io/parkervcp/yolks:python_3.13"
+    },
+    "file_denylist": [],
+    "startup": "./start.sh --config commonwealth-server.json $( [[ \"${UPDATE_DEPENDENCIES}\" == \"1\" ]] && printf %s '--update-dependencies' )",
+    "config": {
+        "files": "{\n    \"commonwealth-server.json\": {\n        \"parser\": \"json\",\n        \"find\": {\n            \"host\": \"0.0.0.0\",\n            \"port\": \"{{server.allocations.default.port}}\",\n            \"server_name\": \"{{server.environment.SERVER_NAME}}\",\n            \"server_description\": \"{{server.environment.SERVER_DESCRIPTION}}\",\n            \"max_players\": \"{{server.environment.MAX_PLAYERS}}\",\n            \"log_verbosity\": \"{{server.environment.LOG_VERBOSITY}}\"\n        }\n    }\n}",
+        "startup": "{\n    \"done\": \"server listening on\"\n}",
+        "logs": "{}",
+        "stop": "quit"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\n# Commonwealth Online Server - install / update script\n#\n# Server Files: /mnt/server\n# Clones the repository and copies the Python dedicated server (server/)\n# into the container. Re-running the installer updates the code while\n# keeping commonwealth-server.json, bans.json, logs and the .venv.\n\nset -e\n\nGIT_ADDRESS=\"${GIT_ADDRESS:-https://git.zambazosmedia.group/Commonwealth-Online/Commonwealth-Online-Server.git}\"\n\nif ! command -v git >/dev/null 2>&1; then\n    apt-get update && apt-get install -y --no-install-recommends git ca-certificates\nfi\n\nif [[ -n \"${USERNAME}\" && -n \"${ACCESS_TOKEN}\" ]]; then\n    GIT_ADDRESS=\"$(echo \"${GIT_ADDRESS}\" | sed -E \"s#^https://#https://${USERNAME}:${ACCESS_TOKEN}@#\")\"\nfi\n\nrm -rf /tmp/cwo-src\necho \"Cloning repository${BRANCH:+ (branch ${BRANCH})}...\"\nif [[ -n \"${BRANCH}\" ]]; then\n    git clone --depth 1 --branch \"${BRANCH}\" \"${GIT_ADDRESS}\" /tmp/cwo-src\nelse\n    git clone --depth 1 \"${GIT_ADDRESS}\" /tmp/cwo-src\nfi\n\nif [[ ! -f /tmp/cwo-src/server/consumer_server_cli.py ]]; then\n    echo \"ERROR: server/consumer_server_cli.py not found in repository.\"\n    exit 1\nfi\n\nmkdir -p /mnt/server\ncd /mnt/server\n\n# Preserve operator state across reinstalls.\nmkdir -p /tmp/cwo-keep\nfor f in commonwealth-server.json bans.json; do\n    [[ -f \"$f\" ]] && cp -a \"$f\" /tmp/cwo-keep/\ndone\n\ncp -a /tmp/cwo-src/server/. /mnt/server/\n\nfor f in commonwealth-server.json bans.json; do\n    [[ -f \"/tmp/cwo-keep/$f\" ]] && cp -a \"/tmp/cwo-keep/$f\" \"/mnt/server/$f\"\ndone\n\n# Normalise line endings / executable bits in case of CRLF checkouts.\nsed -i 's/\\r$//' start.sh fix-port.sh 2>/dev/null || true\nchmod +x start.sh fix-port.sh 2>/dev/null || true\n\n(cd /tmp/cwo-src && git rev-parse --short HEAD) > /mnt/server/.installed-commit || true\nrm -rf /tmp/cwo-src /tmp/cwo-keep\n\necho \"-----------------------------------------\"\necho \"Commonwealth Online Server installed ($(cat /mnt/server/.installed-commit 2>/dev/null))\"\necho \"Python dependencies are installed into .venv on first start.\"\necho \"-----------------------------------------\"\n",
+            "container": "ghcr.io/parkervcp/installers:debian",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "sort": 1,
+            "name": "Server Name",
+            "description": "Display name shown in the LAN browser and to clients.",
+            "env_variable": "SERVER_NAME",
+            "default_value": "Commonwealth Online Server",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": [
+                "required",
+                "string",
+                "max:64"
+            ]
+        },
+        {
+            "sort": 2,
+            "name": "Server Description",
+            "description": "Optional short description.",
+            "env_variable": "SERVER_DESCRIPTION",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": [
+                "nullable",
+                "string",
+                "max:256"
+            ]
+        },
+        {
+            "sort": 3,
+            "name": "Max Players",
+            "description": "Maximum player count (1-256).",
+            "env_variable": "MAX_PLAYERS",
+            "default_value": "16",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": [
+                "required",
+                "integer",
+                "between:1,256"
+            ]
+        },
+        {
+            "sort": 4,
+            "name": "Log Verbosity",
+            "description": "Server log level. 'debug' enables per-packet logs.",
+            "env_variable": "LOG_VERBOSITY",
+            "default_value": "info",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": [
+                "required",
+                "string",
+                "in:debug,info,warning,error"
+            ]
+        },
+        {
+            "sort": 5,
+            "name": "Force Dependency Update",
+            "description": "Set to 1 to reinstall Python dependencies into .venv on next start.",
+            "env_variable": "UPDATE_DEPENDENCIES",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": [
+                "required",
+                "boolean"
+            ]
+        },
+        {
+            "sort": 6,
+            "name": "Git Repo Address",
+            "description": "Repository to install the server from. Reinstall the server to pull updates.",
+            "env_variable": "GIT_ADDRESS",
+            "default_value": "https://git.zambazosmedia.group/Commonwealth-Online/Commonwealth-Online-Server.git",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": [
+                "nullable",
+                "string"
+            ]
+        },
+        {
+            "sort": 7,
+            "name": "Install Branch",
+            "description": "Branch to install. Leave empty for the default branch.",
+            "env_variable": "BRANCH",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": [
+                "nullable",
+                "string"
+            ]
+        },
+        {
+            "sort": 8,
+            "name": "Git Username",
+            "description": "Username for a private repository. Leave empty if public.",
+            "env_variable": "USERNAME",
+            "default_value": "",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": [
+                "nullable",
+                "string"
+            ]
+        },
+        {
+            "sort": 9,
+            "name": "Git Access Token",
+            "description": "Access token for a private repository. Leave empty if public.",
+            "env_variable": "ACCESS_TOKEN",
+            "default_value": "",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": [
+                "nullable",
+                "string"
+            ]
+        }
+    ]
+}
