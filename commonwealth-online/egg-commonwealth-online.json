@@ -21,7 +21,7 @@
     "file_denylist": [],
     "startup": "./start.sh --config commonwealth-server.json $( [[ \"${UPDATE_DEPENDENCIES}\" == \"1\" ]] && printf %s '--update-dependencies' )",
     "config": {
-        "files": "{\n    \"commonwealth-server.json\": {\n        \"parser\": \"json\",\n        \"find\": {\n            \"host\": \"0.0.0.0\",\n            \"port\": \"{{server.allocations.default.port}}\",\n            \"server_name\": \"{{server.environment.SERVER_NAME}}\",\n            \"server_description\": \"{{server.environment.SERVER_DESCRIPTION}}\",\n            \"max_players\": \"{{server.environment.MAX_PLAYERS}}\",\n            \"log_verbosity\": \"{{server.environment.LOG_VERBOSITY}}\"\n        }\n    }\n}",
+        "files": "{\n    \"commonwealth-server.json\": {\n        \"parser\": \"json\",\n        \"find\": {\n            \"host\": \"0.0.0.0\",\n            \"port\": \"{{server.build.default.port}}\",\n            \"server_name\": \"{{server.environment.SERVER_NAME}}\",\n            \"server_description\": \"{{server.environment.SERVER_DESCRIPTION}}\",\n            \"max_players\": \"{{server.environment.MAX_PLAYERS}}\",\n            \"log_verbosity\": \"{{server.environment.LOG_VERBOSITY}}\"\n        }\n    }\n}",
         "startup": "{\n    \"done\": \"server listening on\"\n}",
         "logs": "{}",
         "stop": "quit"
